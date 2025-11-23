@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ryder Cup 2026 - Official</title>
+    <style>
+        /* ... (GARDE LE MÊME CSS QU'AVANT) ... */
+        
+        /* Ajoute juste ce style pour la zone de paiement */
+        #payment-section {
+            display: none; /* Caché au début */
+            text-align: center;
+            background: #e6fffa;
+            border: 2px solid #2c7a7b;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .qr-code-img {
+            max-width: 200px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        /* ... (Reste du CSS inchangé) ... */
+        
+        /* Je remets le CSS de base pour que le code soit complet si tu copies tout */
+        :root { --europe-blue: #003399; --europe-yellow: #FFCC00; --usa-red: #BF0A30; --usa-navy: #002868; --grass-green: #1a4a29; --white: #ffffff; --grey-light: #f3f4f6; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: var(--grey-light); color: #333; }
+        header { background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?q=80&w=1920'); background-size: cover; background-position: center; height: 60vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: var(--white); padding: 20px; border-bottom: 5px solid var(--grass-green); }
+        h1 { font-size: 4rem; margin: 0; text-transform: uppercase; letter-spacing: 3px; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); }
+        .subtitle { font-size: 1.5rem; margin-top: 10px; font-weight: 300; }
+        #loading-bar { background: var(--europe-yellow); color: var(--europe-blue); text-align: center; padding: 10px; font-weight: bold; display: none; }
+        .teams-container { display: flex; justify-content: center; gap: 20px; max-width: 1000px; margin: -50px auto 40px auto; padding: 0 20px; position: relative; z-index: 10; }
+        .team-card { flex: 1; background: var(--white); border-radius: 10px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.2); display: flex; flex-direction: column; }
+        .team-header { padding: 20px; text-align: center; color: var(--white); text-transform: uppercase; font-weight: bold; font-size: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .header-europe { background-color: var(--europe-blue); border-bottom: 4px solid var(--europe-yellow); }
+        .header-usa { background-color: var(--usa-navy); border-bottom: 4px solid var(--usa-red); }
+        .flag-icon { font-size: 3rem; line-height: 1; }
+        .player-list { list-style: none; padding: 0; margin: 0; }
+        .player-slot { padding: 12px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; }
+        .player-slot:last-child { border-bottom: none; }
+        .player-slot.empty { color: #ccc; font-style: italic; }
+        .player-hcp { font-weight: bold; color: #666; font-size: 0.85rem; background: #eee; padding: 2px 8px; border-radius: 10px; }
+        .registration-section { max-width: 600px; margin: 0 auto 50px auto; background: var(--white); padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }
+        .registration-section h2 { color: var(--grass-green); margin-bottom: 20px; }
+        form { display: flex; flex-direction: column; gap: 15px; text-align: left; }
+        label { font-weight: bold; font-size: 0.9rem; color: #444; }
+        input, select { padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 1rem; }
+        button { margin-top: 10px; padding: 15px; background-color: var(--grass-green); color: white; border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+        button:hover { background-color: #14522d; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        @media (max-width: 768px) { .teams-container { flex-direction: column; margin-top: 20px; } h1 { font-size: 2.5rem; } header { height: 40vh; } }
+    </style>
+</head>
+<body>
+
+    <div id="loading-bar">Chargement des données... ⏳</div>
+
+    <header>
+        <h1>Ryder Cup 2026</h1>
+        <div class="subtitle">Team Europe vs Team USA</div>
+        <p>Golf de Rigenée • Premier Départ 13.00 • Vendredi 27 Mars 2026</p>
+    </header>
+
+    <div class="teams-container">
+        <div class="team-card">
+            <div class="team-header header-europe">
+                <span class="flag-icon">🇪🇺</span> Team Europe
+            </div>
+            <ul class="player-list" id="list-europe">Loading...</ul>
+        </div>
+        <div class="team-card">
+            <div class="team-header header-usa">
+                <span class="flag-icon">🇺🇸</span> Team USA
+            </div>
+            <ul class="player-list" id="list-usa">Loading...</ul>
+        </div>
+    </div>
+
+    <div class="registration-section">
+        <div id="form-container">
+            <h2>Rejoindre la Compétition</h2>
+            <p>Inscrivez votre nom pour apparaître dans le tableau.</p>
+            
+            <form id="ryderForm">
+                <label for="playerName">Prénom & Nom</label>
+                <input type="text" id="playerName" name="nom" placeholder="Ex: Rory McIlroy" required>
+
+                <label for="playerHcp">HCP / Index</label>
+                <input type="number" id="playerHcp" name="hcp" placeholder="Ex: 4.5" step="0.1" required>
+
+                <label for="teamSelect">Choisir votre camp</label>
+                <select id="teamSelect" name="equipe" required>
+                    <option value="" disabled selected>-- Sélectionner une équipe --</option>
+                    <option value="europe">🇪🇺 Team Europe</option>
+                    <option value="usa">🇺🇸 Team USA</option>
+                </select>
+
+                <button type="submit" id="submitBtn">Valider l'inscription</button>
+            </form>
+        </div>
+
+        <div id="payment-section">
+            <h2 style="color:#2c7a7b;">✅ Inscription confirmée !</h2>
+            <p>Votre place est réservée dans l'équipe. Veuillez maintenant régler votre participation via Payconiq.</p>
+            
+            <img src="payconiq.jpg" alt="QR Code Payconiq" class="qr-code-img" onerror="this.style.display='none'">
+            
+            <p><strong>Montant : 50€</strong></p>
+            <p style="font-size:0.9rem; color:#666;">Scannez avec votre application bancaire ou Payconiq.</p>
+            
+            <button onclick="location.reload()" style="background-color:#2c7a7b; margin-top:15px;">Retour au tableau des scores</button>
+        </div>
+    </div>
+
+    <footer>
+        <p style="text-align:center; color:#888; padding-bottom:20px;">Ryder Cup 2026</p>
+    </footer>
+
+    <script>
+        // ======================================================
+        // ⚠️ COLLE TON URL SHEETDB CI-DESSOUS
+        // ======================================================
+        const API_URL = "https://sheetdb.io/api/v1/q4ke3ce1bep6s"; 
+
+        const MAX_PLAYERS = 10;
+        const loadingBar = document.getElementById('loading-bar');
+        const submitBtn = document.getElementById('submitBtn');
+        const formContainer = document.getElementById('form-container');
+        const paymentSection = document.getElementById('payment-section');
+
+        async function loadPlayers() {
+            loadingBar.style.display = 'block';
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                const europe = data.filter(p => p.equipe === 'europe');
+                const usa = data.filter(p => p.equipe === 'usa');
+                renderList('list-europe', europe);
+                renderList('list-usa', usa);
+            } catch (error) {
+                console.error('Erreur:', error);
+            } finally {
+                loadingBar.style.display = 'none';
+            }
+        }
+
+        function renderList(elementId, players) {
+            const list = document.getElementById(elementId);
+            list.innerHTML = '';
+            for (let i = 0; i < MAX_PLAYERS; i++) {
+                const li = document.createElement('li');
+                if (players[i]) {
+                    li.className = 'player-slot';
+                    li.innerHTML = `<span>${players[i].nom}</span> <span class="player-hcp">${players[i].hcp}</span>`;
+                } else {
+                    li.className = 'player-slot empty';
+                    li.innerHTML = `<span>Place disponible ${i + 1}</span> <span>--</span>`;
+                }
+                list.appendChild(li);
+            }
+        }
+
+        document.getElementById('ryderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = new FormData(e.target);
+            const playerData = {
+                nom: form.get('nom'),
+                prenom: form.get('prenom'),
+                hcp: form.get('hcp'),
+                equipe: form.get('equipe')
+            };
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Sauvegarde en cours...";
+
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: playerData })
+                });
+
+                // Cacher le formulaire et afficher le paiement
+                formContainer.style.display = 'none';
+                paymentSection.style.display = 'block';
+                
+                loadPlayers(); 
+
+            } catch (error) {
+                alert("Erreur lors de l'inscription. Vérifiez votre connexion.");
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Valider l'inscription";
+            }
+        });
+
+        loadPlayers();
+    </script>
+</body>
+</html>
